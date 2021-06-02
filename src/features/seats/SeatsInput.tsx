@@ -12,7 +12,7 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import { useHistory } from 'react-router-dom'
-import { setSeatsData } from './seatsSlice'
+import { setSeatsData } from './inputSeatsSlice'
 import { useAppDispatch } from '../../app/hooks'
 
 export const SeatsInput: React.FC = () => {

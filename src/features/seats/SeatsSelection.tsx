@@ -1,34 +1,40 @@
 import React, { useEffect, useState } from 'react'
-import { Flex, Grid, GridItem, HStack, Spinner } from '@chakra-ui/react'
+import { Flex, Box, Grid, GridItem, HStack, Spinner, Button } from '@chakra-ui/react'
 import { SingleSeat } from './SingleSeat'
-import { ISeat, setSeatsData } from './seatsSlice'
+import type { ISeat } from './inputSeatsSlice'
 import { RootState } from '../../app/store'
 import { useHistory } from 'react-router-dom'
-import { useAppSelector } from '../../app/hooks'
+import { useAppDispatch, useAppSelector } from '../../app/hooks'
+import { removeAllSeats } from './selectSeatsSlice'
 
 export const SeatsSelection: React.FC = () => {
   const history = useHistory()
 
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [error, setError] = useState(null)
+  const [isLoaded, setIsLoaded] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
   const [seats, setSeats] = useState<ISeat[]>([])
-  const [maxX, setMaxX] = useState(0)
-  const [maxY, setMaxY] = useState(0)
+  const [maxX, setMaxX] = useState<number>(0)
+  const [maxY, setMaxY] = useState<number>(0)
 
-  const seatsData = useAppSelector((state: RootState) => ({
-    counter: state.seats.counter as number,
-    nextToOthers: state.seats.nextToOthers as boolean,
-  }))
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (seatsData.counter === null) {
+    dispatch(removeAllSeats())
+  }, [dispatch])
+
+  const userSeatsData = useAppSelector((state: RootState) => ({
+    counter: state.inputSeats.counter as number,
+    nextToOthers: state.inputSeats.nextToOthers as boolean,
+  }))
+
+  const selectedSeats = useAppSelector((state: RootState) => state.selectSeats.selected as ISeat[])
+
+  useEffect(() => {
+    if (userSeatsData.counter === null) {
       history.replace('/')
     }
-    return () => {
-      setSeatsData([])
-    }
-  }, [seatsData])
+  }, [history, userSeatsData])
 
   useEffect(() => {
     const fetchAPIData = async (): Promise<void> => {
@@ -37,13 +43,16 @@ export const SeatsSelection: React.FC = () => {
         if (result) {
           const allX = result.map((s) => s.cords.x)
           const allY = result.map((s) => s.cords.y)
+
           setMaxX(Math.max(...allX))
           setMaxY(Math.max(...allY))
 
           setIsLoaded(true)
+          result.forEach((r) => (r.selected = false))
           setSeats(result)
         }
       } catch (e) {
+        console.log(e)
         setIsLoaded(true)
         setError(e)
       }
@@ -53,57 +62,64 @@ export const SeatsSelection: React.FC = () => {
       setSeats([])
     }
   }, [])
+
   if (error) {
-    return (
-      <>
-        <div>Error:</div>
-        {error}
-      </>
-    )
+    return <Box>Error:{JSON.stringify(error)}</Box>
   }
+
   if (!isLoaded) {
     return <Spinner />
   }
 
-  if (seats) {
-    return (
-      <Flex w={'100%'} justify={'center'} align={'center'} direction={'column'}>
-        {seatsData.counter}
-        {seatsData.nextToOthers ? 'true' : 'false'}
-        <Grid
-          templateRows={`repeat(${maxY + 1}, 1fr)`}
-          templateColumns={`repeat(${maxX + 1}, 1fr)`}
-          w={{ base: '80%', sm: '60%', md: '45%', lg: '40%', xl: '25%' }}
-          gridGap={'2px'}
-          gridColumnGap={'2px'}
+  return (
+    <Flex w={'100%'} justify={'center'} align={'center'} direction={'column'}>
+      {selectedSeats.length}/{userSeatsData.counter}
+      <Grid
+        templateRows={`repeat(${maxY + 1}, 1fr)`}
+        templateColumns={`repeat(${maxX + 1}, 1fr)`}
+        w={{ base: '80%', sm: '60%', md: '45%', lg: '40%', xl: '25%' }}
+        gridGap={'2px'}
+        gridColumnGap={'2px'}
+      >
+        {seats.map((seat) => {
+          return (
+            <GridItem
+              key={seat.id}
+              colStart={seat.cords.x + 1}
+              rowStart={seat.cords.y + 1}
+              w={'auto'}
+            >
+              <SingleSeat
+                selected={selectedSeats.some((s) => s.id === seat.id)}
+                reserved={seat.reserved}
+                seat={seat}
+              />
+            </GridItem>
+          )
+        })}
+      </Grid>
+      <HStack mt={'20px'}>
+        <Flex
+          direction={'row'}
+          justify={'center'}
+          align={'center'}
+          fontSize={{ base: '11px', md: '16px' }}
         >
-          {seats.map((seat) => {
-            return (
-              <GridItem
-                key={seat.id}
-                colStart={seat.cords.x + 1}
-                rowStart={seat.cords.y + 1}
-                w={'auto'}
-              >
-                <SingleSeat reserved={seat.reserved} seatId={seat.id} selected={false} />
-              </GridItem>
-            )
-          })}
-        </Grid>
-        <HStack mt={'20px'}>
-          <Flex
-            direction={'row'}
-            justify={'center'}
-            align={'center'}
-            fontSize={{ base: '11px', md: '16px' }}
+          <SingleSeat reserved={false} selected={false} clickable={false} /> Miejsca wolne
+          <SingleSeat reserved={true} selected={false} clickable={false} /> Miejsca zarezerwowane
+          <SingleSeat reserved={false} selected={true} clickable={false} /> Twój wybór
+          <Button
+            variant={'outline'}
+            mx={2}
+            onClick={() => {
+              if (selectedSeats.length === userSeatsData.counter) history.push('summary')
+              else alert(`wybierz jeszcze ${userSeatsData.counter - selectedSeats.length} miejsc`)
+            }}
           >
-            <SingleSeat reserved={false} selected={false} /> Miejsca wolne
-            <SingleSeat reserved={true} selected={false} /> Miejsca zarezerwowane
-            <SingleSeat reserved={false} selected={true} /> Twój wybór
-          </Flex>
-        </HStack>
-      </Flex>
-    )
-  }
-  return null
+            Rezerwuj
+          </Button>
+        </Flex>
+      </HStack>
+    </Flex>
+  )
 }

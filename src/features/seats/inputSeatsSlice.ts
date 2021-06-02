@@ -7,6 +7,7 @@ export interface ISeat {
     y: number
   }
   reserved: boolean
+  selected?: boolean
 }
 
 export interface ISeatInputData {
@@ -19,8 +20,8 @@ const initialState: ISeatInputData = {
   nextToOthers: false,
 }
 
-export const seatsSlice = createSlice({
-  name: 'seats',
+export const inputSeatsSlice = createSlice({
+  name: 'inputSeats',
   initialState,
   reducers: {
     setSeatsData(state, action) {
@@ -30,6 +31,6 @@ export const seatsSlice = createSlice({
   },
 })
 
-export const { setSeatsData } = seatsSlice.actions
+export const { setSeatsData } = inputSeatsSlice.actions
 
-export default seatsSlice.reducer
+export default inputSeatsSlice.reducer

@@ -3,6 +3,7 @@ import { SeatsInput } from './features/seats/SeatsInput'
 import { Route, Switch } from 'react-router-dom'
 import { SeatsSelection } from './features/seats/SeatsSelection'
 import { Flex } from '@chakra-ui/react'
+import { Summary } from './components/Summary'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface AppProps {}
@@ -12,13 +13,13 @@ const App: React.FC<AppProps> = () => {
     <Flex align={'center'} justify={'center'} h={'100%'}>
       <Switch>
         <Route exact path={'/'}>
-          <SeatsInput></SeatsInput>
+          <SeatsInput />
         </Route>
         <Route path={'/seats'}>
-          <SeatsSelection></SeatsSelection>
+          <SeatsSelection />
         </Route>
         <Route path={'/summary'}>
-          <div>Podsumowanie</div>
+          <Summary />
         </Route>
       </Switch>
     </Flex>
