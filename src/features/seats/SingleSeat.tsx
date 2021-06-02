@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Box } from '@chakra-ui/react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { selectSeat, removeSeat } from './selectSeatsSlice'
@@ -30,14 +30,22 @@ export const SingleSeat: React.FC<SeatComponentProps> = ({
     if (!reserved) {
       if (selectedSeats.some((s) => s.id === seat?.id)) {
         dispatch(removeSeat({ seat }))
-        setIsSelected(false)
       } else {
         if (selectedSeats.length >= availableSeats) return
         dispatch(selectSeat({ seat }))
-        setIsSelected(true)
       }
     }
   }, [clickable, reserved, selectedSeats, seat, dispatch, availableSeats])
+
+  useEffect(() => {
+    if (seat?.id) {
+      if (selectedSeats.some((s) => s.id === seat.id)) {
+        setIsSelected(true)
+      } else {
+        setIsSelected(false)
+      }
+    }
+  }, [seat?.id, selectedSeats])
 
   return (
     <Box

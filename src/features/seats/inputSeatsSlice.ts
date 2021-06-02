@@ -7,7 +7,6 @@ export interface ISeat {
     y: number
   }
   reserved: boolean
-  selected?: boolean
 }
 
 export interface ISeatInputData {
