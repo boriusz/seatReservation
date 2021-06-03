@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import {
   Button,
   Checkbox,
@@ -21,12 +21,12 @@ export const SeatsInput: React.FC = () => {
   const checkboxEl = useRef<HTMLInputElement>(null)
   const dispatch = useAppDispatch()
 
-  const handleSaveData = (): void => {
+  const handleSaveData = useCallback(() => {
     const nextToOthers = checkboxEl?.current?.checked ?? false
     const counter = Number(seatsCount)
     dispatch(setSeatsData({ counter, nextToOthers }))
     history.push('/seats')
-  }
+  }, [dispatch, history, seatsCount])
 
   return (
     <>
@@ -41,7 +41,7 @@ export const SeatsInput: React.FC = () => {
             </NumberInputStepper>
           </NumberInput>
         </InputGroup>
-        <Checkbox ref={checkboxEl}>Miejsca obok siebie?</Checkbox>
+        <Checkbox ref={checkboxEl}>Czy miejsca obok siebie?</Checkbox>
         <Button onClick={handleSaveData}>Wybierz miejsca</Button>
       </VStack>
     </>

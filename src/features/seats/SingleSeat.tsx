@@ -50,7 +50,7 @@ export const SingleSeat: React.FC<SeatComponentProps> = ({
   return (
     <Box
       onClick={handleClick}
-      cursor={clickable ? 'pointer' : undefined}
+      cursor={clickable && !reserved ? 'pointer' : undefined}
       w={{ base: '5vw', sm: '4vw', md: '3vw', lg: '2.5vw', xl: '2vw' }}
       h={{ base: '5vw', sm: '4vw', md: '3vw', lg: '2.5vw', xl: '2vw' }}
       bg={isSelected ? 'orange' : reserved ? 'red' : 'green'}

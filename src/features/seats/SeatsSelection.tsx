@@ -7,7 +7,7 @@ import { useHistory } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { removeAllSeats, selectSeat } from './slices/selectSeatsSlice'
 import { IncompleteDataModal } from '../../components/IncompleteDataModal'
-import { automaticSeatSelection } from '../../automaticSeatSelection'
+import { automaticSeatSelection } from '../../utils/automaticSeatSelection'
 
 export const SeatsSelection: React.FC = () => {
   const history = useHistory()
@@ -45,7 +45,7 @@ export const SeatsSelection: React.FC = () => {
     if (userSeatsData.counter === null) {
       history.replace('/')
     }
-  }, [history, userSeatsData])
+  }, [history, userSeatsData.counter])
 
   useEffect(() => {
     const fetchAPIData = async (): Promise<void> => {
@@ -62,7 +62,6 @@ export const SeatsSelection: React.FC = () => {
           setSeats(result)
         }
       } catch (e) {
-        console.log(e)
         setIsLoaded(true)
         setError(e)
       }
