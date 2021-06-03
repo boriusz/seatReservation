@@ -36,13 +36,17 @@ export const SeatsInput: React.FC = () => {
           <NumberInput min={1} max={20} value={seatsCount} onChange={(val) => setSeatsCount(val)}>
             <NumberInputField />
             <NumberInputStepper>
-              <NumberIncrementStepper />
+              <NumberIncrementStepper data-testid={'input'} />
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
         </InputGroup>
-        <Checkbox ref={checkboxEl}>Czy miejsca obok siebie?</Checkbox>
-        <Button onClick={handleSaveData}>Wybierz miejsca</Button>
+        <Checkbox data-testid={'checkbox'} ref={checkboxEl}>
+          Czy miejsca obok siebie?
+        </Checkbox>
+        <Button onClick={handleSaveData} data-testid={'select'}>
+          Wybierz miejsca
+        </Button>
       </VStack>
     </>
   )

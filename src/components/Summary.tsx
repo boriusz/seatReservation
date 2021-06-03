@@ -34,7 +34,7 @@ export const Summary: React.FC = () => {
           <UnorderedList h={'100%'}>
             {selectedSeats.map((s) => {
               return (
-                <ListItem key={s.id + 's'}>
+                <ListItem key={s.id + 's'} data-testid={'li'}>
                   Rząd {s.cords.y + 1}, miejsce {s.cords.x + 1}.
                 </ListItem>
               )

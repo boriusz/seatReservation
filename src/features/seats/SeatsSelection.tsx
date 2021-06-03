@@ -88,7 +88,13 @@ export const SeatsSelection: React.FC = () => {
         visible={isAlertVisible}
         onClick={() => setIsAlertVisible(false)}
       />
-      <Flex w={'100%'} justify={'center'} align={'center'} direction={'column'}>
+      <Flex
+        w={'100%'}
+        justify={'center'}
+        align={'center'}
+        direction={'column'}
+        data-testid={'loadeddata'}
+      >
         {selectedSeats.length}/{userSeatsData.counter}
         <Grid
           templateRows={`repeat(${maxY + 1}, 1fr)`}
