@@ -1,9 +1,25 @@
-import { ISeat } from './features/seats/inputSeatsSlice'
+import type { ISeat } from './features/seats/slices/inputSeatsSlice'
 
 interface AutomaticSeatSelectionParams {
   allSeats: ISeat[]
   numOfSeats: number
   adjacent: boolean
+}
+
+const calculateLongestPossibleSequence = (mapOfSeats: number[][]): number => {
+  let longestPossibleSequence = 0
+  mapOfSeats.forEach((row) => {
+    let localLongest = 0
+    let tempLongest = 0
+    row.forEach((item) => {
+      if (item === 0) tempLongest++
+      else {
+        tempLongest > localLongest ? (localLongest = tempLongest) : null
+      }
+    })
+    if (longestPossibleSequence < localLongest) longestPossibleSequence = localLongest
+  })
+  return longestPossibleSequence
 }
 
 export const automaticSeatSelection = (opts: AutomaticSeatSelectionParams): ISeat[] => {
@@ -22,42 +38,86 @@ export const automaticSeatSelection = (opts: AutomaticSeatSelectionParams): ISea
       mapOfSeats[s.cords.y][s.cords.x] = s.reserved ? 1 : 0
     })
 
+    const longestPossibleSequence = calculateLongestPossibleSequence(mapOfSeats)
+
     const result: ISeat[] = []
+    const checkedY: number[] = []
 
     while (result.length < numOfSeats) {
-      const randomY = Math.floor(Math.random() * mapOfSeats.length)
       const randomX = Math.floor(Math.random() * mapOfSeats[0].length)
+      let randomY = Math.floor(Math.random() * mapOfSeats.length)
+      if (checkedY.length > 0) {
+        const maxCheckedY = Math.max(...checkedY)
+        const minCheckedY = Math.min(...checkedY)
+        if (Math.random() > 0.5) {
+          if (maxCheckedY === biggestY) {
+            randomY = minCheckedY - 1
+          } else {
+            randomY = maxCheckedY + 1
+          }
+        } else {
+          if (minCheckedY === 0) {
+            randomY = maxCheckedY + 1
+          } else {
+            randomY = minCheckedY - 1
+          }
+        }
+      }
+
       const currRow = mapOfSeats[randomY]
       const currItem = currRow[randomX]
+
       if (currItem === 0) {
+        const tempResult: ISeat[] = []
         for (let i = randomX; i < currRow.length; i++) {
           if (currRow[i] === 0) {
             const seat = allSeats.find((s) => s.cords.x === i && s.cords.y === randomY)
-            if (seat && result.length < numOfSeats) {
-              result.push(seat)
+            if (seat && result.length + tempResult.length < numOfSeats) {
+              tempResult.push(seat)
             }
           } else {
+            if (checkedY.length > 0) {
+              if (!currRow.every((i) => i === 1)) {
+                checkedY.push(randomY + 1)
+              }
+            }
             break
           }
         }
-        if (numOfSeats - result.length <= currRow.length - (currRow.length - randomX)) {
-          for (let i = randomX - 1; i >= 0; i--) {
-            if (currRow[i] === 0) {
-              const seat = allSeats.find((s) => s.cords.x === i && s.cords.y === randomY)
-              if (seat && result.length < numOfSeats) {
-                result.push(seat)
-              }
-            } else {
-              break
+        for (let i = randomX - 1; i >= 0; i--) {
+          if (currRow[i] === 0) {
+            const seat = allSeats.find((s) => s.cords.x === i && s.cords.y === randomY)
+            if (seat && result.length + tempResult.length < numOfSeats) {
+              tempResult.push(seat)
             }
+          } else {
+            if (checkedY.length > 0) {
+              if (currRow.every((i) => i === 1)) {
+                checkedY.push(randomY + 1)
+              }
+            }
+            break
           }
-          if (result.length < numOfSeats) {
-            result.splice(0)
-          }
-        } else {
-          result.splice(0)
         }
-      } else {
+        if (result.length + tempResult.length === numOfSeats) {
+          result.push(...tempResult)
+          break
+        }
+
+        if (numOfSeats >= longestPossibleSequence) {
+          if (result.length === 0) {
+            if (tempResult.length === longestPossibleSequence) {
+              result.push(...tempResult)
+              checkedY.push(randomY)
+            }
+          } else {
+            result.push(...tempResult)
+            checkedY.push(randomY)
+          }
+        }
+        //
+        //
+      } else if (numOfSeats <= longestPossibleSequence) {
         result.splice(0)
       }
     }
@@ -65,8 +125,13 @@ export const automaticSeatSelection = (opts: AutomaticSeatSelectionParams): ISea
     return result
   } else {
     const result: ISeat[] = []
+    const rolled: number[] = []
     while (result.length < numOfSeats) {
-      const randomNum = Math.floor(Math.random() * allSeats.length)
+      let randomNum = Math.floor(Math.random() * allSeats.length)
+      while (rolled.some((r) => r === randomNum)) {
+        randomNum = Math.floor(Math.random() * allSeats.length)
+      }
+      rolled.push(randomNum)
       const randomlyChosenSeat = allSeats[randomNum]
       if (randomlyChosenSeat && !randomlyChosenSeat.reserved) {
         result.push(randomlyChosenSeat)
@@ -74,11 +139,4 @@ export const automaticSeatSelection = (opts: AutomaticSeatSelectionParams): ISea
     }
     return result
   }
-
-  // for (let i = 0; i < biggestY; i ++) {
-  //   const thislevelSeats = .allSeats.filter((s) => s.cords.y === i)
-  //   thislevelSeats.sort((a, b) => )
-  // }
-  // const seatsSortedByRows = .allSeats.sort((a, b) => (a.cords.y >= b.cords.y ? 1 : -1))
-  // const uninterpretedSeats =
 }

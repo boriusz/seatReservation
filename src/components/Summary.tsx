@@ -1,38 +1,50 @@
 import React from 'react'
-import { Flex, Box, ListItem, UnorderedList, Heading, Text, Link } from '@chakra-ui/react'
+import { Box, ListItem, UnorderedList, Heading, Text, Link, Flex } from '@chakra-ui/react'
 import { useAppSelector } from '../app/hooks'
 import { RootState } from '../app/store'
-import { ISeat } from '../features/seats/inputSeatsSlice'
+import { ISeat } from '../features/seats/slices/inputSeatsSlice'
 import { Link as RouterLink } from 'react-router-dom'
 
 export const Summary: React.FC = () => {
-  const selectedSeats = useAppSelector((state: RootState) => state.selectSeats.selected as ISeat[])
+  const selectedSeats = useAppSelector((state: RootState) => {
+    const s: ISeat[] = JSON.parse(JSON.stringify(state.selectSeats.selected as ISeat[]))
+    return s.sort((a, b) => {
+      if (a.cords.y === b.cords.y) {
+        return a.cords.x > b.cords.x ? 1 : -1
+      } else {
+        return a.cords.y > b.cords.y ? 1 : -1
+      }
+    })
+  })
   const expectedNumOfSeats = useAppSelector((state: RootState) => state.inputSeats.counter)
 
   if (selectedSeats.length > 0 && selectedSeats.length === expectedNumOfSeats) {
     return (
-      <Flex
+      <Box
         direction={'column'}
         align={{ base: 'flex-start', md: 'center' }}
         justify={'center'}
-        height={'60%'}
+        fontSize={{ base: '14px', md: '16px' }}
+        my={10}
         mx={8}
       >
         <Heading>Twoja rezerwacja przebiegła pomyślnie!</Heading>
-        <Box h={'60%'} mt={'auto'}>
-          Wybrane miejsca:
-          <UnorderedList>
+        <Flex h={'auto'} w={'100%'} my={2} align={'center'} justify={'center'} direction={'column'}>
+          <Text>Wybrane miejsca:</Text>
+          <UnorderedList h={'100%'}>
             {selectedSeats.map((s) => {
               return (
-                <ListItem key={s.id}>
+                <ListItem key={s.id + 's'}>
                   Rząd {s.cords.y + 1}, miejsce {s.cords.x + 1}.
                 </ListItem>
               )
             })}
           </UnorderedList>
-        </Box>
-        <Text>Dziękujemy! W razie problemów prosimy o kontakt z działem administracji.</Text>
-      </Flex>
+        </Flex>
+        <Text align={{ base: 'left', md: 'center' }}>
+          Dziękujemy! W razie problemów prosimy o kontakt z działem administracji.
+        </Text>
+      </Box>
     )
   } else {
     return (

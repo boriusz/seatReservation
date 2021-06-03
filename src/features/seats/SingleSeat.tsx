@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Box } from '@chakra-ui/react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { selectSeat, removeSeat } from './selectSeatsSlice'
-import { ISeat } from './inputSeatsSlice'
+import { selectSeat, removeSeat } from './slices/selectSeatsSlice'
+import { ISeat } from './slices/inputSeatsSlice'
 import { RootState } from '../../app/store'
 
 interface SeatComponentProps {

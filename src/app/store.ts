@@ -1,6 +1,6 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
-import inputSeatsReducer from '../features/seats/inputSeatsSlice'
-import selectSeatsReducer from '../features/seats/selectSeatsSlice'
+import inputSeatsReducer from '../features/seats/slices/inputSeatsSlice'
+import selectSeatsReducer from '../features/seats/slices/selectSeatsSlice'
 
 export const store = configureStore({
   reducer: {

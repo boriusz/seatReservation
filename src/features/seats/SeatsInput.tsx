@@ -12,7 +12,7 @@ import {
   VStack,
 } from '@chakra-ui/react'
 import { useHistory } from 'react-router-dom'
-import { setSeatsData } from './inputSeatsSlice'
+import { setSeatsData } from './slices/inputSeatsSlice'
 import { useAppDispatch } from '../../app/hooks'
 
 export const SeatsInput: React.FC = () => {
@@ -33,7 +33,7 @@ export const SeatsInput: React.FC = () => {
       <VStack m={'auto'}>
         <InputGroup w={'auto'}>
           <InputLeftAddon>Liczba miejsc</InputLeftAddon>
-          <NumberInput min={1} max={10} value={seatsCount} onChange={(val) => setSeatsCount(val)}>
+          <NumberInput min={1} max={20} value={seatsCount} onChange={(val) => setSeatsCount(val)}>
             <NumberInputField />
             <NumberInputStepper>
               <NumberIncrementStepper />

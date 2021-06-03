@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { Flex, Box, Grid, GridItem, HStack, Spinner, Button } from '@chakra-ui/react'
 import { SingleSeat } from './SingleSeat'
-import type { ISeat } from './inputSeatsSlice'
+import type { ISeat } from './slices/inputSeatsSlice'
 import { RootState } from '../../app/store'
 import { useHistory } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { removeAllSeats, selectSeat } from './selectSeatsSlice'
+import { removeAllSeats, selectSeat } from './slices/selectSeatsSlice'
 import { IncompleteDataModal } from '../../components/IncompleteDataModal'
 import { automaticSeatSelection } from '../../automaticSeatSelection'
 
@@ -30,11 +30,8 @@ export const SeatsSelection: React.FC = () => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    dispatch(removeAllSeats())
-  }, [dispatch])
-
-  useEffect(() => {
     if (seats.length > 0) {
+      dispatch(removeAllSeats())
       const selected = automaticSeatSelection({
         allSeats: seats,
         numOfSeats: userSeatsData.counter,
